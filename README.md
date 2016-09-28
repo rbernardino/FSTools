@@ -1,2 +1,2 @@
 # FSTools
-PowerShell scripts in managing the filesystem.
+PowerShell scripts for managing the filesystem.
