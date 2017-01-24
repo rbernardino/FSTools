@@ -20,7 +20,7 @@ Properties {
     }
 }
 
-Task Default -Depends Deploy
+Task Default -Depends Build
 
 Task Init {
     $lines
