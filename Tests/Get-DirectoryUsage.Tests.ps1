@@ -8,7 +8,7 @@
 Get-Module FSTools | Remove-Module -Force
 
 # Import the module from the local path, not from the users Documents folder
-Import-Module .\FSTools.psm1 -Force
+Import-Module "$PSScriptRoot\..\FSTools" -Force -Verbose
 
 Describe 'Get-DirectoryUsage Tests' -Tags 'Unit' {
     
