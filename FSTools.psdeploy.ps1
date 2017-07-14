@@ -60,3 +60,12 @@ if(
         }
     }
 }
+
+# Publish to local 
+Deploy ToFilesystem {
+    by Filesystem {
+        FromSource 'FSTools'
+        To $(Join-Path -Path $env:psmodulepath.split(';')[0] -ChildPath FSTools -Resolve)
+        Tagged Test
+    }
+}
