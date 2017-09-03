@@ -13,14 +13,15 @@ Import-Module "$PSScriptRoot\..\FSTools" -Force -Verbose
 Describe 'Get-DirectoryUsage Tests' -Tags 'Unit' {
     
   InModuleScope FSTools {
-    #region Setup
-			$TestFolder = New-Item -ItemType Directory "$($TestDrive)$('TestFolder')"
-			New-Item -ItemType File "$TestFolder\TestFile1.txt"
-			New-Item -ItemType File "$TestFolder\TestFile2.txt"
 
-			$EmptyFolder = New-Item -ItemType Directory "$($TestDrive)$('Emptyfolder')" 
+    #region Arrange
+      $TestFolder = New-Item -ItemType Directory "$($TestDrive)$('TestFolder')"
+      New-Item -ItemType File "$TestFolder\TestFile1.txt"
+      New-Item -ItemType File "$TestFolder\TestFile2.txt"
+      
+      $EmptyFolder = New-Item -ItemType Directory "$($TestDrive)$('Emptyfolder')" 
 
-			$properties = ('SearchDirectory', 'Location', 'Filename', 'Filesize')
+      $properties = ('SearchDirectory', 'Location', 'Filename', 'Filesize')
     #endregion
 
     Context 'Unit tests for values passed via PARAMETER' {
@@ -109,7 +110,7 @@ Describe 'Get-DirectoryUsage Tests' -Tags 'Unit' {
 
       } #end Context "Multiple Values passed via $Value should have the correct properties"
 
-		} #end foreach($Value in $SourceValues) 
+    } #end foreach($Value in $SourceValues) 
 		
   }
      

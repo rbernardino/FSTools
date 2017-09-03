@@ -61,7 +61,7 @@ if(
 	}
 }
 
-# Publish to local 
+# Publish to local
 Deploy ToFilesystem {
 	by Filesystem {
 		FromSource 'FSTools'
