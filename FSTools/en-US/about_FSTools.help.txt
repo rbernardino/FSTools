@@ -1,0 +1,8 @@
+TOPIC
+    about_FSTools
+
+SHORT DESCRIPTION
+    FSTools is a module which contains cmdlets for managing the filesystem.
+
+LONG DESCRIPTION
+    FSTools is a module which contains cmdlets for managing the filesystem.
