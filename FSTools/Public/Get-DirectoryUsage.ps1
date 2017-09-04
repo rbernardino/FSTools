@@ -38,7 +38,9 @@
     [Parameter(Mandatory = $True,
       ValueFromPipeline = $True,
       ValueFromPipelineByPropertyname = $True)]
-    [string[]]$Directory
+    [string[]]$Directory,
+
+    [int]$First = 10
   )
 
   BEGIN
@@ -54,9 +56,10 @@
       Write-Verbose "[$Prgname] Searching directory $ADirectory..."
       if ( (Test-Path $ADirectory -PathType Container) )
       {
-        $consumers = Get-ChildItem $ADirectory -Recurse -File |
-          Sort-Object length -Descending |
-          Select-Object DirectoryName, Name, Length -First 10
+        $consumers = Get-ChildItem $ADirectory -Recurse |
+            Where-Object { -not $_.PSIsContainer } |
+            Sort-Object length -Descending |
+            Select-Object DirectoryName, Name, Length -First $First
 
         foreach ($consumer in $consumers)
         {
