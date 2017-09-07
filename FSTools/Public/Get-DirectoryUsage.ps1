@@ -59,7 +59,7 @@
       Write-Verbose "[$Prgname] Searching directory $ADirectory..."
       if ( (Test-Path $ADirectory -PathType Container) )
       {
-        $rootFolderFiles = Get-ChildItem $ADirectory | Where-Object { -not $_.PSIsContainer }
+        $rootFolderFiles = @(Get-ChildItem $ADirectory | Where-Object { -not $_.PSIsContainer })
 
         $foldersToSearch = Get-ChildItem $ADirectory | Where-Object { $_.PSIsContainer } |
           Where-Object {-not ($_ -in $Exclude)}
