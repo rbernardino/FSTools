@@ -17,8 +17,6 @@ Describe 'Get-DirectoryUsage Tests' -Tags 'Unit' {
     #region Arrange
       $TestFolder = New-Item -ItemType Directory "$($TestDrive)\$('TestFolder')"
       New-Item -ItemType File "$TestFolder\TestFile1.txt"
-      $testFile2 = New-Item -ItemType File "$TestFolder\TestFile2.txt"
-      Set-Content -Path $testFile2 -Value 'Test content'
 
       $EmptyFolder = New-Item -ItemType Directory "$($TestDrive)\$('Emptyfolder')"
 
@@ -51,12 +49,12 @@ Describe 'Get-DirectoryUsage Tests' -Tags 'Unit' {
       It 'Should process an existing directory' {
         $results = Get-DirectoryUsage -Directory $TestFolder
         $results | Should Not BeNullOrEmpty
-        $results.FilesCount | Should Be 4
+        $results.FilesCount | Should Be 3
       }
 
       It 'Should not process an excluded directory' {
         $results = Get-DirectoryUsage -Directory $TestFolder -Exclude 'ExcludeFolder'
-        $results.FilesCount | Should Be 2
+        $results.FilesCount | Should Be 1
         $results.RootDirectory.foreach({ $_ -in @("$ExcludeFolder") | Should Be $false})
       }
 
@@ -79,7 +77,7 @@ Describe 'Get-DirectoryUsage Tests' -Tags 'Unit' {
       It 'Should process an existing directory' {
         $results = $TestFolder | Get-DirectoryUsage
         $results | Should Not BeNullOrEmpty
-        $results.FilesCount | Should Be 4
+        $results.FilesCount | Should Be 3
       }
 
     } #end Context 'Unit tests for values passed via PIPELINE'
