@@ -5,23 +5,29 @@
 #endregion
 
 # If the module is already in memory, remove it
-Get-Module FSTools | Remove-Module -Force
+Get-Module FSTools -All | Remove-Module -Force
 
 # Import the module from the local path, not from the users Documents folder
 Import-Module "$PSScriptRoot\..\FSTools" -Force -Verbose
 
 Describe 'Get-DirectoryUsage Tests' -Tags 'Unit' {
-    
+
   InModuleScope FSTools {
 
     #region Arrange
-      $TestFolder = New-Item -ItemType Directory "$($TestDrive)$('TestFolder')"
+      $TestFolder = New-Item -ItemType Directory "$($TestDrive)\$('TestFolder')"
       New-Item -ItemType File "$TestFolder\TestFile1.txt"
-      New-Item -ItemType File "$TestFolder\TestFile2.txt"
-      
-      $EmptyFolder = New-Item -ItemType Directory "$($TestDrive)$('Emptyfolder')" 
+      $testFile2 = New-Item -ItemType File "$TestFolder\TestFile2.txt"
+      Set-Content -Path $testFile2 -Value 'Test content'
 
-      $properties = ('SearchDirectory', 'Location', 'Filename', 'Filesize')
+      $EmptyFolder = New-Item -ItemType Directory "$($TestDrive)\$('Emptyfolder')"
+
+      $ExcludeFolder = New-Item -ItemType Directory "$TestFolder\ExcludeFolder"
+      New-Item -ItemType File "$ExcludeFolder\TestFile3.txt"
+      $testFile4 = New-Item -ItemType File "$ExcludeFolder\TestFile4.txt"
+      Set-Content -Path $testFile4 -Value 'Test content'
+
+      $properties = ('RootDirectory', 'Summary', 'Files', 'FilesCount', 'TotalUsage')
     #endregion
 
     Context 'Unit tests for values passed via PARAMETER' {
@@ -37,20 +43,27 @@ Describe 'Get-DirectoryUsage Tests' -Tags 'Unit' {
         Assert-MockCalled Write-Warning -Exactly 1
       }
 
-      It 'Should process an empty directory but nothing is returned' {
-        $Consumers = Get-DirectoryUsage -Directory $EmptyFolder
-        $Consumers | Should BeNullOrEmpty 
+      It 'Should process an empty directory and the total number of files returned is zero' {
+        $results = Get-DirectoryUsage -Directory $EmptyFolder
+        $results.FilesCount | Should Be 0
       }
 
       It 'Should process an existing directory' {
-        $Consumers = Get-DirectoryUsage -Directory $TestFolder
-        $Consumers | Should Not BeNullOrEmpty 
+        $results = Get-DirectoryUsage -Directory $TestFolder
+        $results | Should Not BeNullOrEmpty
+        $results.FilesCount | Should Be 4
+      }
+
+      It 'Should not process an excluded directory' {
+        $results = Get-DirectoryUsage -Directory $TestFolder -Exclude 'ExcludeFolder'
+        $results.FilesCount | Should Be 2
+        $results.RootDirectory.foreach({ $_ -in @("$ExcludeFolder") | Should Be $false})
       }
 
     } #end Context 'Unit tests for values passed via PARAMETER'
 
     Context 'Unit tests for values passed via PIPELINE' {
-            
+
       Mock -Verifiable Write-Warning -ModuleName FSTools
 
       It 'Should not process a non-existing directory' {
@@ -58,21 +71,22 @@ Describe 'Get-DirectoryUsage Tests' -Tags 'Unit' {
         Assert-MockCalled Write-Warning -Exactly 1
       }
 
-      It 'Should process an empty directory but nothing is returned' {
-        $Consumers = $EmptyFolder | Get-DirectoryUsage
-        $Consumers | Should BeNullOrEmpty 
+      It 'Should process an empty directory and the total number of files returned is zero' {
+        $results = $EmptyFolder | Get-DirectoryUsage
+        $results.FilesCount | Should Be 0
       }
 
       It 'Should process an existing directory' {
-        $Consumers = $TestFolder | Get-DirectoryUsage
-        $Consumers | Should Not BeNullOrEmpty
+        $results = $TestFolder | Get-DirectoryUsage
+        $results | Should Not BeNullOrEmpty
+        $results.FilesCount | Should Be 4
       }
 
     } #end Context 'Unit tests for values passed via PIPELINE'
 
     $SourceValues = ('PIPELINE', 'PARAMETER')
 
-    foreach ($Value in $SourceValues) 
+    foreach ($Value in $SourceValues)
     {
       Context "Multiple Values passed via $Value should have the correct properties" {
 
@@ -80,38 +94,38 @@ Describe 'Get-DirectoryUsage Tests' -Tags 'Unit' {
 
         if ($Value -eq 'PIPELINE')
         {
-          $Consumers = $TestFolder, 'NonExistingFolder', $EmptyFolder | Get-DirectoryUsage
+          $results = $TestFolder, 'NonExistingFolder', $EmptyFolder | Get-DirectoryUsage
           It 'Should not process a non-existing directory' {
             Assert-MockCalled Write-Warning -Exactly 1
           }
-                                 
+
         }
         else
         {
-          $Consumers = Get-DirectoryUsage -Directory $TestFolder, 'NonExistingFolder', $EmptyFolder, 'MissingFolder'
+          $results = Get-DirectoryUsage -Directory $TestFolder, 'NonExistingFolder', $EmptyFolder, 'MissingFolder'
           It 'Should not process a non-existing directory' {
             Assert-MockCalled Write-Warning -Exactly 2
           }
         }
-            
-        foreach ($property in $properties) 
+
+        foreach ($property in $properties)
         {
-          foreach ($Consumer in $Consumers)
+          foreach ($result in $results)
           {
             It "should have a property of $property" {
               # All objects in PowerShell have a base type called PSObject
-              [bool]($Consumer.PSObject.Properties.Name -match $property) |
+              [bool]($result.PSObject.Properties.Name -match $property) |
                 Should Be $true
             }
 
-          } #end foreach ($Consumer in $Consumers)
+          } #end foreach ($result in $results)
 
-        } #end foreach ($property in $properties) 
+        } #end foreach ($property in $properties)
 
       } #end Context "Multiple Values passed via $Value should have the correct properties"
 
-    } #end foreach($Value in $SourceValues) 
-		
+    } #end foreach($Value in $SourceValues)
+
   }
-     
+
 }
