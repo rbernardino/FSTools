@@ -41,8 +41,6 @@
       ValueFromPipelineByPropertyname = $True)]
     [string[]]$Directory,
 
-    [int]$First = 10,
-
     [string[]]$Exclude
   )
 
