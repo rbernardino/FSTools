@@ -3,6 +3,8 @@
 # FSTools
 PowerShell scripts for managing the filesystem.
 
+This is a work in progress and new cmdlets will be added over time.
+
 ### Credits to:
 
 [Rambling Cookie Monster][RCM]
