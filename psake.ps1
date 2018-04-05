@@ -65,7 +65,7 @@ Task Build -Depends Test {
   # Bump the module version
   Try
   {
-    $Version = Get-NextPSGalleryVersion -Name $env:BHProjectName -ErrorAction Stop
+    $Version = Get-NextNugetPackageVersion -Name $env:BHProjectName -ErrorAction Stop
     Update-Metadata -Path $env:BHPSModuleManifest -PropertyName ModuleVersion -Value $Version -ErrorAction stop
   }
   Catch
