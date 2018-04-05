@@ -67,7 +67,7 @@ if ($env:BHBuildSystem -eq 'Unknown')
   Deploy ToFilesystem {
     by Filesystem {
       FromSource $ENV:BHPSModulePath
-      To $(Join-Path -Path $env:psmodulepath.split(';')[0] -ChildPath FSTools -Resolve)
+      To $(Join-Path -Path $env:psmodulepath.split(';')[0] -ChildPath FSTools)
       Tagged Test
     }
   }
